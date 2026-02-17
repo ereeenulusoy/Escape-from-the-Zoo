@@ -15,23 +15,28 @@ public class Player : MonoBehaviour
     [SerializeField] private float moveSpeed;
     [SerializeField] private float jumpForce;
     [SerializeField] private float doubleJumpForce;
-
     private bool canDoubleJump;
 
 
+    [Header("Detections")]
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] float groundCheckDistance;
+    [SerializeField] float wallCheckDistance;
+    private bool isWallDetected;
+    private bool isGrounded;
+    private bool isAirborne;
 
+    [Header("Wall Interactions")]
+    [SerializeField] private Vector2 wallJumpForce;
+    [SerializeField] private float wallJumpDuration;
+    private bool isWallJumping;
+
+    [Header("Flip")]
     private int facingDir = 1;
     private bool lookingRight = true;
 
-    [Header("Collision Info")]
-    [SerializeField] private LayerMask groundLayer;
 
-    [SerializeField] float groundCheckDistance;
-    [SerializeField] float wallCheckDistance;
    
-    private bool isGrounded;
-    private bool isAirborne;
-    private bool isWallDetected;
 
     
   
@@ -99,20 +104,26 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void JumpButton()
+
+    private void WallJump()
     {
-        if (isGrounded)
-        {
-            Jump();
-        }
-        else if (canDoubleJump)
-        {
-           DoubleJump(); 
-        }
+        canDoubleJump = true;
+        StartCoroutine(WallJumpRoutine());
+        rb.velocity = new Vector2(wallJumpForce.x * -facingDir, wallJumpForce.y);
+        Flip();
     }
 
+    private IEnumerator WallJumpRoutine()
+    {
+        isWallJumping = true;
+        
+        yield return new WaitForSeconds(wallJumpDuration);
+        isWallJumping = false;
+
+    }
     private void DoubleJump()
     {
+        isWallJumping = false; //neden stopallcoroutines kullanmýyoruz ? true olarak kalabiliyor ve inputu sonsuza dek kitliyor.
         canDoubleJump = false;
         rb.velocity = new Vector2(rb.velocity.x, doubleJumpForce);
     }
@@ -121,11 +132,32 @@ public class Player : MonoBehaviour
     {
         rb.velocity = new Vector2(rb.velocity.x, jumpForce);
     }
+    private void JumpButton()
+    {
+        if (isGrounded)
+        {
+            Jump();
+        }
+        else if (isWallDetected)
+        {
+            StopAllCoroutines();
+            WallJump(); 
+        }
+        else if (canDoubleJump)
+        {
+            DoubleJump();            
+        }
+        
+    }
 
     private void HandleMovement()
     {
-        if (isWallDetected)
+        if(isWallDetected)
             return;
+
+        if(isWallJumping)
+            return;
+
         rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
     }
 
