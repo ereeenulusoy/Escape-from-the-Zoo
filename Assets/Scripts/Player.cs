@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -17,6 +18,9 @@ public class Player : MonoBehaviour
     [SerializeField] private float doubleJumpForce;
     private bool canDoubleJump;
 
+    [Header("Buffer Jump")]
+    [SerializeField] private float bufferJumpTreshold = .25f;
+    private float bufferJumpAttemptTime;
 
     [Header("Detections")]
     [SerializeField] private LayerMask groundLayer;
@@ -35,9 +39,11 @@ public class Player : MonoBehaviour
     private int facingDir = 1;
     private bool lookingRight = true;
 
-
-   
-
+    [Header("Knockback")]
+    [SerializeField] private Vector2 knockbackForce;
+    [SerializeField] private float knockbackDuration;
+    private bool isKnocked;
+    private bool canBeKnocked;
     
   
     private void Awake()
@@ -48,15 +54,27 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        
+        UpdateAirborneStatus();
+       
+        if (isKnocked)
+            return;
         HandleInput();
         HandleWallSlide();
-        UpdateAirborneStatus();
-        HandleFlip();
         HandleMovement();
+        HandleFlip();
         HandleCollisions();
         HandleAnimations();
 
     }
+
+    public void Knockback()
+    {
+        StartCoroutine(KnockbackRoutine());
+        anim.SetTrigger("knockback");
+        rb.velocity = new Vector2 (knockbackForce.x * -facingDir, knockbackForce.y);
+    }
+
 
     private void HandleWallSlide()
     {
@@ -91,6 +109,7 @@ public class Player : MonoBehaviour
     {
         isAirborne = false;
         canDoubleJump = true;
+        AttemptBufferJump();
     }
 
     private void HandleInput()
@@ -101,16 +120,33 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space)) //vertical input
         {
             JumpButton();
+            RequestBufferJump();
         }
     }
 
-
-    private void WallJump()
+    private void RequestBufferJump() // it wants to do buffer jump. 
     {
-        canDoubleJump = true;
-        StartCoroutine(WallJumpRoutine());
-        rb.velocity = new Vector2(wallJumpForce.x * -facingDir, wallJumpForce.y);
-        Flip();
+        if (isAirborne)
+        {
+            bufferJumpAttemptTime = Time.time;
+        }
+    }
+    
+    private void AttemptBufferJump()
+    {
+        if (Time.time < bufferJumpAttemptTime + bufferJumpTreshold)
+        {
+            Jump();
+            bufferJumpAttemptTime = Time.time - 1;
+        }
+    }
+    private IEnumerator KnockbackRoutine()
+    {
+        isKnocked = true;
+        canBeKnocked = false;
+        yield return new WaitForSeconds(knockbackDuration);
+        isKnocked = false;
+        canBeKnocked= true;
     }
 
     private IEnumerator WallJumpRoutine()
@@ -120,6 +156,13 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(wallJumpDuration);
         isWallJumping = false;
 
+    }
+    private void WallJump()
+    {
+        canDoubleJump = true;
+        StartCoroutine(WallJumpRoutine());
+        rb.velocity = new Vector2(wallJumpForce.x * -facingDir, wallJumpForce.y);
+        Flip();
     }
     private void DoubleJump()
     {
@@ -134,6 +177,7 @@ public class Player : MonoBehaviour
     }
     private void JumpButton()
     {
+        
         if (isGrounded)
         {
             Jump();
@@ -152,7 +196,8 @@ public class Player : MonoBehaviour
 
     private void HandleMovement()
     {
-        if(isWallDetected)
+       
+        if (isWallDetected)
             return;
 
         if(isWallJumping)
