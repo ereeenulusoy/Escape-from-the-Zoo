@@ -18,9 +18,11 @@ public class Player : MonoBehaviour
     [SerializeField] private float doubleJumpForce;
     private bool canDoubleJump;
 
-    [Header("Buffer Jump")]
+    [Header("Buffer & Coyote Jump")]
     [SerializeField] private float bufferJumpTreshold = .25f;
+    [SerializeField] private float coyoteJumpTreshold = .25f;
     private float bufferJumpAttemptTime;
+    private float coyoteJumpLeavingTime;
 
     [Header("Detections")]
     [SerializeField] private LayerMask groundLayer;
@@ -43,9 +45,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Vector2 knockbackForce;
     [SerializeField] private float knockbackDuration;
     private bool isKnocked;
-    private bool canBeKnocked;
     
-  
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -53,8 +53,7 @@ public class Player : MonoBehaviour
     }
 
     private void Update()
-    {
-        
+    {   
         UpdateAirborneStatus();
        
         if (isKnocked)
@@ -65,46 +64,34 @@ public class Player : MonoBehaviour
         HandleFlip();
         HandleCollisions();
         HandleAnimations();
-
     }
-
     public void Knockback()
     {
         StartCoroutine(KnockbackRoutine());
         anim.SetTrigger("knockback");
         rb.velocity = new Vector2 (knockbackForce.x * -facingDir, knockbackForce.y);
     }
-
-
-    private void HandleWallSlide()
+    private IEnumerator KnockbackRoutine()
     {
-        bool canWallSlide = isWallDetected && rb.velocity.y < 0;
-        float yModifier = yInput < 0 ? .99f : 0.35f;
-       //If you pressing down, yInput is going to equals .99f, else it's .35f ..
-
-        if (!canWallSlide)
-            return;   
-            
-        rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * yModifier);
+        isKnocked = true;
+        yield return new WaitForSeconds(knockbackDuration);
+        isKnocked = false;
     }
     private void UpdateAirborneStatus()
     {
         if (isGrounded && isAirborne)
-        {
             HandleLanding();
-        }
 
         if (!isGrounded && !isAirborne)
-        {
             BecomeAirborne();
-        }
     }
-
     private void BecomeAirborne()
     {
         isAirborne = true;
-    }
 
+        if(rb.velocity.y <= 0)
+           AttemptCoyoteJump();
+    }
     private void HandleLanding()
     {
         isAirborne = false;
@@ -124,14 +111,14 @@ public class Player : MonoBehaviour
         }
     }
 
+    #region Buffer & Coyote Jump
+    private void AttemptCoyoteJump() => coyoteJumpLeavingTime = Time.time;
+    private void CancelCoyoteJump() => coyoteJumpLeavingTime = Time.time - 1;
     private void RequestBufferJump() // it wants to do buffer jump. 
     {
         if (isAirborne)
-        {
             bufferJumpAttemptTime = Time.time;
-        }
     }
-    
     private void AttemptBufferJump()
     {
         if (Time.time < bufferJumpAttemptTime + bufferJumpTreshold)
@@ -140,19 +127,12 @@ public class Player : MonoBehaviour
             bufferJumpAttemptTime = Time.time - 1;
         }
     }
-    private IEnumerator KnockbackRoutine()
-    {
-        isKnocked = true;
-        canBeKnocked = false;
-        yield return new WaitForSeconds(knockbackDuration);
-        isKnocked = false;
-        canBeKnocked= true;
-    }
 
+    #endregion
+  
     private IEnumerator WallJumpRoutine()
     {
         isWallJumping = true;
-        
         yield return new WaitForSeconds(wallJumpDuration);
         isWallJumping = false;
 
@@ -160,9 +140,22 @@ public class Player : MonoBehaviour
     private void WallJump()
     {
         canDoubleJump = true;
-        StartCoroutine(WallJumpRoutine());
         rb.velocity = new Vector2(wallJumpForce.x * -facingDir, wallJumpForce.y);
         Flip();
+
+        StopAllCoroutines();
+        StartCoroutine(WallJumpRoutine());
+    }
+    private void HandleWallSlide()
+    {
+        bool canWallSlide = isWallDetected && rb.velocity.y < 0;
+        float yModifier = yInput < 0 ? .99f : 0.35f;
+        //If you pressing down, yInput is going to equals .99f, else it's .35f ..
+
+        if (!canWallSlide)
+            return;
+
+        rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * yModifier);
     }
     private void DoubleJump()
     {
@@ -170,33 +163,28 @@ public class Player : MonoBehaviour
         canDoubleJump = false;
         rb.velocity = new Vector2(rb.velocity.x, doubleJumpForce);
     }
-
-    private void Jump()
-    {
-        rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-    }
+    private void Jump() => rb.velocity = new Vector2(rb.velocity.x, jumpForce);
     private void JumpButton()
     {
-        
-        if (isGrounded)
+        bool canCoyoteJump = Time.time < coyoteJumpLeavingTime + coyoteJumpTreshold;
+
+        if (isGrounded || canCoyoteJump) // normal zýplama yapmaya çalýþýrken coyotejump aktive edilebilir ondan burada!!
         {
             Jump();
         }
         else if (isWallDetected)
         {
-            StopAllCoroutines();
             WallJump(); 
         }
         else if (canDoubleJump)
         {
             DoubleJump();            
         }
-        
+        CancelCoyoteJump();
     }
 
     private void HandleMovement()
-    {
-       
+    { 
         if (isWallDetected)
             return;
 
@@ -232,12 +220,8 @@ public class Player : MonoBehaviour
     }
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow;
-
-        Gizmos.DrawLine(transform.position,(new Vector2(transform.position.x, transform.position.y - groundCheckDistance)));
-
         Gizmos.color = Color.red;
-
+        Gizmos.DrawLine(transform.position,(new Vector2(transform.position.x, transform.position.y - groundCheckDistance)));
         Gizmos.DrawLine(transform.position, (new Vector2(transform.position.x + (wallCheckDistance * facingDir), transform.position.y)));
     }
 }
