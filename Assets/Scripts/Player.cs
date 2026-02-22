@@ -20,9 +20,9 @@ public class Player : MonoBehaviour
 
     [Header("Buffer & Coyote Jump")]
     [SerializeField] private float bufferJumpTreshold = .25f;
-    [SerializeField] private float coyoteJumpTreshold = .25f;
-    private float bufferJumpAttemptTime;
-    private float coyoteJumpLeavingTime;
+    [SerializeField] private float coyoteJumpTreshold = .5f;
+    private float bufferJumpAttemptTime = -1;
+    private float coyoteJumpLeavingTime = -1;
 
     [Header("Detections")]
     [SerializeField] private LayerMask groundLayer;
@@ -67,9 +67,12 @@ public class Player : MonoBehaviour
     }
     public void Knockback()
     {
+        if (isKnocked)
+            return;
+
         StartCoroutine(KnockbackRoutine());
         anim.SetTrigger("knockback");
-        rb.velocity = new Vector2 (knockbackForce.x * -facingDir, knockbackForce.y);
+        rb.velocity = new Vector2(knockbackForce.x * -facingDir, knockbackForce.y);
     }
     private IEnumerator KnockbackRoutine()
     {
@@ -159,6 +162,7 @@ public class Player : MonoBehaviour
     }
     private void DoubleJump()
     {
+        StopCoroutine(WallJumpRoutine());
         isWallJumping = false; //neden stopallcoroutines kullanmýyoruz ? true olarak kalabiliyor ve inputu sonsuza dek kitliyor.
         canDoubleJump = false;
         rb.velocity = new Vector2(rb.velocity.x, doubleJumpForce);
