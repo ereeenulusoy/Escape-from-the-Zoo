@@ -167,7 +167,9 @@ public class Player : MonoBehaviour
         canDoubleJump = false;
         rb.velocity = new Vector2(rb.velocity.x, doubleJumpForce);
     }
+    
     private void Jump() => rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+  
     private void JumpButton()
     {
         bool canCoyoteJump = Time.time < coyoteJumpLeavingTime + coyoteJumpTreshold;
