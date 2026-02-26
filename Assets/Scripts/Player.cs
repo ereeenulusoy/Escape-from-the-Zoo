@@ -55,15 +55,15 @@ public class Player : MonoBehaviour
     private void Update()
     {   
         UpdateAirborneStatus();
-       
+        UpdateWallDoubleJump();
         if (isKnocked)
             return;
+        HandleCollisions();
+        HandleAnimations();
         HandleInput();
         HandleWallSlide();
         HandleMovement();
         HandleFlip();
-        HandleCollisions();
-        HandleAnimations();
     }
     public void Knockback()
     {
@@ -100,6 +100,12 @@ public class Player : MonoBehaviour
         isAirborne = false;
         canDoubleJump = true;
         AttemptBufferJump();
+    }
+
+    private void UpdateWallDoubleJump()
+    {
+        if(isWallDetected && !canDoubleJump)
+            canDoubleJump = true;
     }
 
     private void HandleInput()

@@ -18729,7 +18729,7 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  groundCheckDistance: 0.7625
+  groundCheckDistance: 0.8
   wallCheckDistance: 0.65
   wallJumpForce: {x: 6, y: 15}
   wallJumpDuration: 0.6
