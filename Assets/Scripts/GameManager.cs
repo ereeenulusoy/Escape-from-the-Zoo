@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
                                         // burada player'ý atarsan player da her yerden çaðrýlabilir.
     public Player player;
 
+    public int fruitsCollected;
+
     private void Awake()
     {
         if(instance == null)
@@ -17,6 +19,7 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject); //eðer baþka bir instance bulunuyorsa ben kopyayým, kendimi siliyorum.
     }
 
+    public void AddFruits() => fruitsCollected++;
 }
 
 

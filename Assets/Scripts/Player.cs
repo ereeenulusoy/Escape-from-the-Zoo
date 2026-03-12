@@ -35,6 +35,7 @@ public class Player : MonoBehaviour
     [Header("Wall Interactions")]
     [SerializeField] private Vector2 wallJumpForce;
     [SerializeField] private float wallJumpDuration;
+    [SerializeField] private float wallYAxisDistance;
     private bool isWallJumping;
 
     [Header("Flip")]
@@ -216,14 +217,17 @@ public class Player : MonoBehaviour
     private void HandleCollisions()
     {
         isGrounded = Physics2D.Raycast(transform.position, Vector2.down, groundCheckDistance, groundLayer);
-        isWallDetected = Physics2D.Raycast(transform.position, Vector2.right * facingDir, wallCheckDistance, groundLayer);
+
+        isWallDetected = Physics2D.Raycast(transform.position, Vector2.right * facingDir, wallCheckDistance, groundLayer) ||
+          Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y + wallYAxisDistance), Vector2.right * facingDir, wallCheckDistance, groundLayer) ||
+          Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - wallYAxisDistance), Vector2.right * facingDir, wallCheckDistance, groundLayer);
     }
 
     private void HandleFlip()
     {
         if (xInput < 0 && lookingRight || xInput > 0 && !lookingRight)
             Flip();
-    }
+    }   
     private void Flip()
     {
         facingDir = facingDir * -1;
@@ -233,7 +237,15 @@ public class Player : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
+
         Gizmos.DrawLine(transform.position,(new Vector2(transform.position.x, transform.position.y - groundCheckDistance)));
+
         Gizmos.DrawLine(transform.position, (new Vector2(transform.position.x + (wallCheckDistance * facingDir), transform.position.y)));
+
+        Gizmos.DrawLine(new Vector2(transform.position.x,transform.position.y + wallYAxisDistance),
+            (new Vector2(transform.position.x + (wallCheckDistance * facingDir), transform.position.y + wallYAxisDistance)));
+      
+        Gizmos.DrawLine(new Vector2(transform.position.x,transform.position.y - wallYAxisDistance),
+            (new Vector2(transform.position.x + (wallCheckDistance * facingDir), transform.position.y - wallYAxisDistance)));
     }
 }
