@@ -5,7 +5,8 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance; // static ram'e yazýlmasýný ve diðer scriptlerde deðer atamasýna gerek kalmadan kullanýlýr.
+    public static GameManager instance; // static ram'e yazýlmasýný ve diðer scriptlerde deðer atamasýna gerek kalmadan
+                                        // kullanýlmasýný saðlar.
                                         // burada player'ý atarsan player da her yerden çaðrýlabilir.
     public Player player;
 
