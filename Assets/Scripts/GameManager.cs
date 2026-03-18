@@ -8,8 +8,11 @@ public class GameManager : MonoBehaviour
     public static GameManager instance; // static ram'e yazýlmasýný ve diðer scriptlerde deðer atamasýna gerek kalmadan
                                         // kullanýlmasýný saðlar.
                                         // burada player'ý atarsan player da her yerden çaðrýlabilir.
+
     public Player player;
 
+    [Header("Fruit Managment")]
+    public bool fruitsHaveRandomLook;
     public int fruitsCollected;
 
     private void Awake()
@@ -21,6 +24,7 @@ public class GameManager : MonoBehaviour
     }
 
     public void AddFruits() => fruitsCollected++;
+    public bool FruitsHaveRandomLook() => fruitsHaveRandomLook; // getter methodu.
 }
 
 
