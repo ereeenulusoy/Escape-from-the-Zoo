@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -33,6 +34,11 @@ public class Player : MonoBehaviour
     private bool isGrounded;
     private bool isAirborne;
 
+    [Header("Knockback")]
+    [SerializeField] private float knockbackDuration;
+    [SerializeField] private Vector2 knockbackForce;
+    private bool isKnocked;
+
 
     void Awake()
     {
@@ -44,6 +50,12 @@ public class Player : MonoBehaviour
     void Update()
     {
         UpdateAirborneStatus();
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            Knockback();
+        }
+        if (isKnocked)
+            return;
         HandleDetections();
         HandleInput();
         HandleWallSlide();
@@ -64,9 +76,25 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void Knockback()
+    {
+        if (isKnocked)
+            return;
+        StartCoroutine(KnockbackRoutine());
+        anim.SetTrigger("knockback");
+        rb.velocity = new Vector2(knockbackForce.x * -facingDir, knockbackForce.y);
+    }
+
+    private IEnumerator KnockbackRoutine()
+    {
+        isKnocked = true;
+        yield return new WaitForSeconds(knockbackDuration);
+        isKnocked = false;
+    }
+
     private void WallJump()
     {
-        StopCoroutine(WallJumpRoutine());
+        StopAllCoroutines();
         StartCoroutine(WallJumpRoutine());
         rb.velocity = new Vector2(wallJumpForce.x *(facingDir * -1), wallJumpForce.y);
         Flip();
