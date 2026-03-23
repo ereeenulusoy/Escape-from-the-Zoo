@@ -17,6 +17,10 @@ public class Player : MonoBehaviour
     [SerializeField] private float doubleJumpForce;
     private bool canDoubleJump = true;
 
+    [Header("Buffer & Coyote Jump")]
+    [SerializeField] private float bufferJumpTreshold;
+    private float bufferJumpRequestTime = -1f;
+
     [Header("Flip variables")]
     private bool isLookingRight = true;
     private int facingDir = 1;
@@ -69,6 +73,7 @@ public class Player : MonoBehaviour
         if (isGrounded && isAirborne)
         {
             HandleLanding();
+            AttemptBufferJump();
         }
         if (!isGrounded && !isAirborne)
         {
@@ -92,6 +97,19 @@ public class Player : MonoBehaviour
         isKnocked = false;
     }
 
+    private void RequestBufferJump()
+    {
+        if(!isGrounded)
+        bufferJumpRequestTime = Time.time;
+    }
+    private void AttemptBufferJump()
+    {
+        if (Time.time < bufferJumpRequestTime + bufferJumpTreshold)
+        {
+            Jump();
+            bufferJumpRequestTime = Time.time - 1;
+        }
+    }
     private void WallJump()
     {
         StopAllCoroutines();
@@ -158,6 +176,7 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             JumpButton();
+            RequestBufferJump();
         }
     }
     private void HandleMovement()

@@ -156,6 +156,7 @@ MonoBehaviour:
   moveSpeed: 6
   jumpForce: 14
   doubleJumpForce: 10
+  bufferJumpTreshold: 0.3
   wallJumpDuration: 0.6
   wallJumpForce: {x: 5, y: 12}
   groundLayer:
