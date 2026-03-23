@@ -12887,6 +12887,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Apple
       objectReference: {fileID: 0}
+    - target: {fileID: 5120013849465662381, guid: 68ea2b220d00f494fa94b20afc024f58, type: 3}
+      propertyPath: pickupFX
+      value: 
+      objectReference: {fileID: 422840375923493988, guid: deff4b81dd13884438fb481d9aa7d0e1, type: 3}
     - target: {fileID: 7839350962191638309, guid: 68ea2b220d00f494fa94b20afc024f58, type: 3}
       propertyPath: m_LocalPosition.x
       value: -9

@@ -15,6 +15,8 @@ public enum FruitType
 public class Fruit : MonoBehaviour
 {
     [SerializeField] private FruitType fruitType;
+    [SerializeField] private GameObject pickupFX;
+
     private GameManager gameManager;
     private Animator anim; //meyvenin animatörüne baðlanýr.
 
@@ -37,6 +39,8 @@ public class Fruit : MonoBehaviour
             gameManager.AddFruits(); // gamemanager'da yönetmemizin sebebi eðer fruitte vs yapmýþ olsak
                                      // data kaybýna neden olabilirdi.
             Destroy(gameObject);
+
+            GameObject newFx = Instantiate(pickupFX, transform.position, Quaternion.identity);
         }
     }
 
