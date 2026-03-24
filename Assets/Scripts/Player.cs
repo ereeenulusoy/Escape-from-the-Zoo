@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    [SerializeField] private GameObject deathVfx;
     private Rigidbody2D rb;
     private Animator anim;
     
@@ -75,11 +76,19 @@ public class Player : MonoBehaviour
         anim.SetTrigger("knockback");
         rb.velocity = new Vector2(knockbackForce.x * -facingDir, knockbackForce.y);
     }
+
     private IEnumerator KnockbackRoutine()
     {
         isKnocked = true;
         yield return new WaitForSeconds(knockbackDuration);
         isKnocked = false;
+    }
+
+    public void Die()
+    {
+        Instantiate(deathVfx, transform.position, Quaternion.identity);
+        Destroy(gameObject);
+
     }
     private void UpdateAirborneStatus()
     {
