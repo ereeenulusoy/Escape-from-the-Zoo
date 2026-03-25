@@ -3,15 +3,24 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.XR;
 
 public class Player : MonoBehaviour
 {
+   
     [SerializeField] private GameObject deathVfx;
+
     private Rigidbody2D rb;
     private Animator anim;
+    private CapsuleCollider2D cd;
+
     
     private float xInput;
     private float yInput;
+
+    [Header("Respawn details")]
+    private float defaultGravityScale;
+    private bool canBeControlled = false;
 
     [Header("Movement details")]
     [SerializeField] private float moveSpeed;
@@ -51,15 +60,27 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        cd = GetComponent<CapsuleCollider2D>();
         anim = GetComponentInChildren<Animator>();
     }
+
+    private void Start()
+    {
+        defaultGravityScale = rb.gravityScale; // önce yazýyoruz ki normal scale'i tutalým.
+        RespawnFinished(false);
+    }
+
 
     private void Update()
     {   
         UpdateAirborneStatus();
-        UpdateWallDoubleJump();
+
+        if (canBeControlled == false)
+            return;
         if (isKnocked)
             return;
+
+        UpdateWallDoubleJump();
         HandleCollisions();
         HandleAnimations();
         HandleInput();
@@ -84,6 +105,21 @@ public class Player : MonoBehaviour
         isKnocked = false;
     }
 
+    public void RespawnFinished(bool finished) // deðer döndürmez ancak gelen boola göre içi deðiþir.
+    {
+        if (finished)
+        {
+            rb.gravityScale = defaultGravityScale;
+            canBeControlled = true;
+            cd.enabled = true;
+        }
+        else
+        {
+            rb.gravityScale = 0;
+            canBeControlled = false;
+            cd.enabled = false;
+        }
+    }
     public void Die()
     {
         Instantiate(deathVfx, transform.position, Quaternion.identity);
