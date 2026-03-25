@@ -15,6 +15,9 @@ public enum FruitType
 public class Fruit : MonoBehaviour
 {
     public FruitType fruitType;
+
+    [SerializeField] GameObject pickupFx;
+
     private GameManager gameManager;
     private Animator anim;
     private void Awake()
@@ -51,7 +54,10 @@ public class Fruit : MonoBehaviour
         if (player != null)
         {
             gameManager.CollectFruit();
-            Destroy(gameObject, 0.2f);
+            Destroy(gameObject, 0.05f);
+
+            GameObject fruitFx = Instantiate(pickupFx, transform.position, Quaternion.identity);
+
         }
     }
 }

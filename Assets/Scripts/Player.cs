@@ -43,15 +43,17 @@ public class Player : MonoBehaviour
     [SerializeField] private Vector2 knockbackForce;
     private bool isKnocked;
 
+    [Header("Player Death")]
+    [SerializeField] private GameObject deathFX;
 
-    void Awake()
+    private void Awake()
     {
       rb = GetComponent<Rigidbody2D>();
       anim = GetComponentInChildren<Animator>();
     }
 
 
-    void Update()
+    private void Update()
     {
         UpdateAirborneStatus();
         if (Input.GetKeyDown(KeyCode.C))
@@ -97,6 +99,11 @@ public class Player : MonoBehaviour
         isKnocked = false;
     }
 
+    public void Die()
+    {
+        Destroy(gameObject);
+        GameObject newDeathFX = Instantiate(deathFX,transform.position, Quaternion.identity);   
+    }
     private void RequestBufferJump()
     {
         if(!isGrounded)
