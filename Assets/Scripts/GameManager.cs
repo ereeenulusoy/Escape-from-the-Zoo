@@ -1,12 +1,16 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance;
-
+    [Header("Player")]
+    [SerializeField] private GameObject playerPrefab;
+    [SerializeField] private Transform respawnPoint;
+    [SerializeField] private float respawnDelay;
     public Player player;
+
+
+    public static GameManager instance;
 
     public int fruitsCollected;
 
@@ -21,6 +25,15 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
     }
 
+    public void RespawnPlayer() => StartCoroutine(RespawnRoutine());
+
+    private IEnumerator RespawnRoutine()
+    {
+        yield return new WaitForSeconds(respawnDelay);
+
+        GameObject newPlayer = Instantiate(playerPrefab, respawnPoint.position, Quaternion.identity);
+        player = newPlayer.GetComponent<Player>();
+    }
     public void CollectFruit() => fruitsCollected++;
 
     public bool SetRandomFruits() => setRandomFruits;

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DeathZone : MonoBehaviour
+public class DeadZone : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -11,6 +11,7 @@ public class DeathZone : MonoBehaviour
         if (player != null)
         {
             player.Die();
+            GameManager.instance.RespawnPlayer();
         }
     }
 }

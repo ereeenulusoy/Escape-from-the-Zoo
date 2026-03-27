@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
 {
     private Animator anim;
     private Rigidbody2D rb;
+    private CapsuleCollider2D cd;
 
     private float xInput;
     private float yInput;
@@ -43,31 +44,58 @@ public class Player : MonoBehaviour
     [SerializeField] private Vector2 knockbackForce;
     private bool isKnocked;
 
+    [Header("Respawn Player")]
+    [SerializeField] private float defaultGravityScale;
+    [SerializeField] private bool canBeControlled = false;
+
     [Header("Player Death")]
     [SerializeField] private GameObject deathFX;
 
     private void Awake()
     {
       rb = GetComponent<Rigidbody2D>();
+      cd = GetComponent<CapsuleCollider2D>();
       anim = GetComponentInChildren<Animator>();
+    }
+
+    private void Start()
+    {
+        defaultGravityScale = rb.gravityScale;
+        RespawnFinished(false);
     }
 
 
     private void Update()
     {
         UpdateAirborneStatus();
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            Knockback();
-        }
+
+        if (!canBeControlled)
+            return;
         if (isKnocked)
             return;
+
         HandleDetections();
         HandleInput();
         HandleWallSlide();
         HandleFlip();
         HandleMovement();
         HandleAnimations();
+    }
+
+    public void RespawnFinished(bool finished)
+    {
+        if (finished)
+        {
+            rb.gravityScale = defaultGravityScale;
+            canBeControlled = true;
+            cd.enabled = true;
+        }
+        else
+        {
+            rb.gravityScale = 0f;
+            canBeControlled = false;
+            cd.enabled = false;
+        }
     }
 
     private void UpdateAirborneStatus() // Yere deðerkenki ve yerde olmadýðýmýz "ÝLK" anda deðiþiklik yapmamýzý saðlar.
