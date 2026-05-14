@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.XR;
@@ -33,6 +34,8 @@ public class Player : MonoBehaviour
 
     [Header("Wall Jump")]
     [SerializeField] private Vector2 wallJumpForce;
+    [SerializeField] private float wallJumpDuration;
+    private bool isWallJumping;
 
 
 
@@ -43,6 +46,7 @@ public class Player : MonoBehaviour
     }
     private void Update()
     {
+        
         UpdateAirborneStatus();
         HandleFlip();
         HandleMovement();
@@ -94,6 +98,23 @@ public class Player : MonoBehaviour
         rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * yMultiplier);
 
     }
+    
+    private void WallJump()
+    {
+       
+        StopCoroutine(WallJumpRoutine());
+        StartCoroutine(WallJumpRoutine());
+        rb.velocity = new Vector2(wallJumpForce.x * - facingDir, wallJumpForce.y);
+        Flip();
+
+    }
+
+    private IEnumerator WallJumpRoutine()
+    {
+        isWallJumping = true;
+        yield return new WaitForSeconds(wallJumpDuration);
+        isWallJumping = false;
+    }
     private void HandleInputs()
     {
         xInput = Input.GetAxisRaw("Horizontal");
@@ -110,6 +131,10 @@ public class Player : MonoBehaviour
         if (isGrounded)
         {
             Jump();
+        }
+        else if(isWallDetected)
+        {
+            WallJump();
         }
         else if (canDoubleJump)
         {
@@ -138,7 +163,9 @@ public class Player : MonoBehaviour
 
     private void HandleMovement()
     {
-        if(isWallDetected)
+        if(isWallJumping)
+            return;
+        if (isWallDetected)
             return;
 
         rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);

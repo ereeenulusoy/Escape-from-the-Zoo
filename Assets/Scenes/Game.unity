@@ -18744,6 +18744,8 @@ MonoBehaviour:
   wallCheckDistance: 0.7
   jumpForce: 14
   doubleJumpForce: 13
+  wallJumpForce: {x: 6, y: 15}
+  wallJumpDuration: 0.6
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
