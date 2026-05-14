@@ -31,6 +31,11 @@ public class Player : MonoBehaviour
     private bool facingRight = true;
     private int facingDir = 1;
 
+    [Header("Wall Jump")]
+    [SerializeField] private Vector2 wallJumpForce;
+
+
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -41,6 +46,7 @@ public class Player : MonoBehaviour
         UpdateAirborneStatus();
         HandleFlip();
         HandleMovement();
+        HandleWallSlide();
         HandleInputs();
         HandleAnimations();
         HandleDetections();
@@ -74,8 +80,20 @@ public class Player : MonoBehaviour
         anim.SetFloat("xVelocity", rb.velocity.x);
         anim.SetFloat("yVelocity", rb.velocity.y);
         anim.SetBool("isGrounded", isGrounded);
+        anim.SetBool("isWallDetected", isWallDetected);
     }
 
+
+    private void HandleWallSlide()
+    {
+        bool canWallSlide = isWallDetected && rb.velocity.y < 0;
+        float yMultiplier = yInput < 0 ? 0.97f : 0.05f;
+
+        if (!canWallSlide)
+            return;
+        rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * yMultiplier);
+
+    }
     private void HandleInputs()
     {
         xInput = Input.GetAxisRaw("Horizontal");
@@ -84,14 +102,6 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             JumpButton();
-        }
-    }
-
-    private void HandleWallSlide()
-    {
-        if (isWallDetected && rb.velocity.y < 0)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.98f);
         }
     }
 
@@ -128,6 +138,9 @@ public class Player : MonoBehaviour
 
     private void HandleMovement()
     {
+        if(isWallDetected)
+            return;
+
         rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
     }
     private void HandleDetections()
@@ -140,7 +153,7 @@ public class Player : MonoBehaviour
     }
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.blue;
+        Gizmos.color = Color.red;
 
         Gizmos.DrawLine(transform.position, new Vector2(transform.position.x, transform.position.y - groundCheckDistance));
         Gizmos.DrawLine(transform.position, new Vector2(transform.position.x + (wallCheckDistance * facingDir), transform.position.y));
