@@ -37,6 +37,10 @@ public class Player : MonoBehaviour
     [SerializeField] private float wallJumpDuration;
     private bool isWallJumping;
 
+    [Header("Knockback")]
+    [SerializeField] private float knockbackDuration;
+    [SerializeField] private Vector2 knockbackForce;
+    private bool isKnocked;
 
 
     private void Awake()
@@ -48,12 +52,18 @@ public class Player : MonoBehaviour
     {
         
         UpdateAirborneStatus();
+        if(isKnocked)
+            return;
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            Knockback();
+        }
+        HandleInputs();
+        HandleWallSlide();
+        HandleDetections();
+        HandleAnimations();
         HandleFlip();
         HandleMovement();
-        HandleWallSlide();
-        HandleInputs();
-        HandleAnimations();
-        HandleDetections();
     }
 
     private void UpdateAirborneStatus()
@@ -66,6 +76,7 @@ public class Player : MonoBehaviour
         {
             BecomeAirborne();
         }
+        UpdateDoubleJump();
     }
 
 
@@ -85,27 +96,43 @@ public class Player : MonoBehaviour
         anim.SetFloat("yVelocity", rb.velocity.y);
         anim.SetBool("isGrounded", isGrounded);
         anim.SetBool("isWallDetected", isWallDetected);
+        
     }
 
 
     private void HandleWallSlide()
     {
         bool canWallSlide = isWallDetected && rb.velocity.y < 0;
-        float yMultiplier = yInput < 0 ? 0.97f : 0.05f;
+        float yMultiplier = yInput < 0 ? 0.995f : 0.05f;
 
         if (!canWallSlide)
             return;
+
         rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * yMultiplier);
 
     }
     
+    public void Knockback()
+    {
+        anim.SetTrigger("knockback");
+        rb.velocity = new Vector2(knockbackForce.x * -facingDir, knockbackForce.y);
+        StartCoroutine(KnockbackRoutine());
+    }
+   
+    private IEnumerator KnockbackRoutine()
+    {
+        isKnocked = true;
+        yield return new WaitForSeconds(knockbackDuration);
+        isKnocked = false;  
+    }
     private void WallJump()
     {
        
-        StopCoroutine(WallJumpRoutine());
-        StartCoroutine(WallJumpRoutine());
         rb.velocity = new Vector2(wallJumpForce.x * - facingDir, wallJumpForce.y);
         Flip();
+        canDoubleJump = true;
+        StopCoroutine(WallJumpRoutine());
+        StartCoroutine(WallJumpRoutine());
 
     }
 
@@ -144,11 +171,27 @@ public class Player : MonoBehaviour
     }
 
     private void Jump() => rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-    private void DoubleJump() => rb.velocity = new Vector2(rb.velocity.x, doubleJumpForce);
+
+    private void UpdateDoubleJump()
+    {
+        if(isWallDetected && !canDoubleJump)
+        {
+            canDoubleJump = true;
+        }
+    }
+    private void DoubleJump()
+    {
+     StopCoroutine(WallJumpRoutine());
+     isWallJumping = false;
+     rb.velocity = new Vector2(rb.velocity.x, doubleJumpForce);
+
+    }
 
 
     private void HandleFlip()
     {
+        if (isWallJumping)
+            return;
         if (xInput < 0 && facingRight || xInput > 0 && !facingRight)
         {
             Flip();
@@ -166,6 +209,8 @@ public class Player : MonoBehaviour
         if(isWallJumping)
             return;
         if (isWallDetected)
+            return;
+        if(isKnocked)
             return;
 
         rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
