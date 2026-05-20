@@ -18748,6 +18748,8 @@ MonoBehaviour:
   wallJumpDuration: 0.6
   knockbackDuration: 0.5
   knockbackForce: {x: 6, y: 8}
+  bufferJumpTreshold: 0.3
+  coyoteJumpTreshold: 0.3
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

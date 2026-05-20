@@ -42,6 +42,11 @@ public class Player : MonoBehaviour
     [SerializeField] private Vector2 knockbackForce;
     private bool isKnocked;
 
+    [Header("Buffer & Coyote Jump")]
+    [SerializeField] private float bufferJumpTreshold;
+    [SerializeField] private float coyoteJumpTreshold;
+    private float bufferJumpAttempTime = -1f;
+    private float coyoteJumpLeavingTime = -1f;
 
     private void Awake()
     {
@@ -52,18 +57,15 @@ public class Player : MonoBehaviour
     {
         
         UpdateAirborneStatus();
+      
         if(isKnocked)
             return;
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            Knockback();
-        }
         HandleInputs();
         HandleWallSlide();
+        HandleMovement();
+        HandleFlip();
         HandleDetections();
         HandleAnimations();
-        HandleFlip();
-        HandleMovement();
     }
 
     private void UpdateAirborneStatus()
@@ -84,10 +86,12 @@ public class Player : MonoBehaviour
     {
         isAirborne = false;
         canDoubleJump = true;
+        BufferJump();
     }
     private void BecomeAirborne()
     {
         isAirborne = true;
+        RequestCoyoteTime();
     }
 
     private void HandleAnimations()
@@ -100,6 +104,99 @@ public class Player : MonoBehaviour
     }
 
 
+    #region Coyote & Buffer Jump
+    private void RequestCoyoteTime()
+    {
+        if(rb.velocity.y <= 0)
+            coyoteJumpLeavingTime = Time.time;  
+    }
+
+
+
+    private void AttemptBufferJump()
+    {
+        if(isAirborne)
+            bufferJumpAttempTime = Time.time;
+    }
+    
+    private void BufferJump()
+    {
+        if(Time.time < bufferJumpAttempTime + bufferJumpTreshold)
+        {
+            Jump();
+            bufferJumpAttempTime = Time.time -1f;
+        }
+    }
+    #endregion
+   
+    
+    public void Knockback()
+    {
+        if (isKnocked)
+            return;
+
+        StartCoroutine(KnockbackRoutine());
+        anim.SetTrigger("knockback");
+        rb.velocity = new Vector2(knockbackForce.x * -facingDir, knockbackForce.y);
+    }
+   
+    private IEnumerator KnockbackRoutine()
+    {
+        isKnocked = true;
+        yield return new WaitForSeconds(knockbackDuration);
+        isKnocked = false;  
+    }
+
+    private void HandleInputs()
+    {
+        xInput = Input.GetAxisRaw("Horizontal");
+        yInput = Input.GetAxisRaw("Vertical");
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            JumpButton();
+            AttemptBufferJump();
+        }
+    }
+
+    private void JumpButton()
+    {
+        bool coyoteJump = Time.time < coyoteJumpLeavingTime + coyoteJumpTreshold;
+        if (isGrounded || coyoteJump)
+        {
+            Jump();
+        }
+        else if(isWallDetected)
+        {
+            WallJump();
+        }
+        else if (canDoubleJump)
+        {
+            DoubleJump();
+            canDoubleJump = false;
+        }
+        coyoteJumpLeavingTime = -1f;
+    }
+
+    private void Jump() => rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+    private void DoubleJump()
+    {
+     StopCoroutine(WallJumpRoutine());
+     isWallJumping = false;
+     rb.velocity = new Vector2(rb.velocity.x, doubleJumpForce);
+
+    }
+
+    private void UpdateDoubleJump()
+    {
+        if(isWallDetected && !canDoubleJump)
+        {
+            canDoubleJump = true;
+        }
+    }
+
+
+    #region Wall Interactions
     private void HandleWallSlide()
     {
         bool canWallSlide = isWallDetected && rb.velocity.y < 0;
@@ -110,20 +207,6 @@ public class Player : MonoBehaviour
 
         rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * yMultiplier);
 
-    }
-    
-    public void Knockback()
-    {
-        anim.SetTrigger("knockback");
-        rb.velocity = new Vector2(knockbackForce.x * -facingDir, knockbackForce.y);
-        StartCoroutine(KnockbackRoutine());
-    }
-   
-    private IEnumerator KnockbackRoutine()
-    {
-        isKnocked = true;
-        yield return new WaitForSeconds(knockbackDuration);
-        isKnocked = false;  
     }
     private void WallJump()
     {
@@ -142,52 +225,7 @@ public class Player : MonoBehaviour
         yield return new WaitForSeconds(wallJumpDuration);
         isWallJumping = false;
     }
-    private void HandleInputs()
-    {
-        xInput = Input.GetAxisRaw("Horizontal");
-        yInput = Input.GetAxisRaw("Vertical");
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            JumpButton();
-        }
-    }
-
-    private void JumpButton()
-    {
-        if (isGrounded)
-        {
-            Jump();
-        }
-        else if(isWallDetected)
-        {
-            WallJump();
-        }
-        else if (canDoubleJump)
-        {
-            DoubleJump();
-            canDoubleJump = false;
-        }
-    }
-
-    private void Jump() => rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-
-    private void UpdateDoubleJump()
-    {
-        if(isWallDetected && !canDoubleJump)
-        {
-            canDoubleJump = true;
-        }
-    }
-    private void DoubleJump()
-    {
-     StopCoroutine(WallJumpRoutine());
-     isWallJumping = false;
-     rb.velocity = new Vector2(rb.velocity.x, doubleJumpForce);
-
-    }
-
-
+    #endregion
     private void HandleFlip()
     {
         if (isWallJumping)
@@ -210,8 +248,7 @@ public class Player : MonoBehaviour
             return;
         if (isWallDetected)
             return;
-        if(isKnocked)
-            return;
+        
 
         rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
     }
