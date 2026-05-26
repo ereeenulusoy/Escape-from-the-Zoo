@@ -8,8 +8,9 @@ public class GameManager : MonoBehaviour
 
     public Player player;
 
+    [Header("Fruits")]
     public int fruitsCollected;
-
+    public bool setRandomFruit;
     private void Awake()
     {
         if (instance == null)
@@ -26,5 +27,7 @@ public class GameManager : MonoBehaviour
     {
         fruitsCollected++;
     }
+
+    public bool SetRandomFruit() => setRandomFruit;
 
 }
