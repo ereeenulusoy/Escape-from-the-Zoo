@@ -1,8 +1,5 @@
-using System;
 using System.Collections;
-using UnityEditorInternal;
 using UnityEngine;
-using UnityEngine.XR;
 
 public class Player : MonoBehaviour
 {
@@ -48,6 +45,9 @@ public class Player : MonoBehaviour
     private float bufferJumpAttempTime = -1f;
     private float coyoteJumpLeavingTime = -1f;
 
+    [Header("VFX")]
+    [SerializeField] private GameObject deathVfx;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -55,10 +55,10 @@ public class Player : MonoBehaviour
     }
     private void Update()
     {
-        
+
         UpdateAirborneStatus();
-      
-        if(isKnocked)
+
+        if (isKnocked)
             return;
         HandleInputs();
         HandleWallSlide();
@@ -67,7 +67,15 @@ public class Player : MonoBehaviour
         HandleDetections();
         HandleAnimations();
     }
+    
+    public void Die()
+    {
 
+     GameObject newDeathVfx = Instantiate(deathVfx, transform.position, Quaternion.identity);
+        
+     Destroy(gameObject);
+
+    }
     private void UpdateAirborneStatus()
     {
         if (isGrounded && isAirborne)
@@ -100,36 +108,36 @@ public class Player : MonoBehaviour
         anim.SetFloat("yVelocity", rb.velocity.y);
         anim.SetBool("isGrounded", isGrounded);
         anim.SetBool("isWallDetected", isWallDetected);
-        
+
     }
 
 
     #region Coyote & Buffer Jump
     private void RequestCoyoteTime()
     {
-        if(rb.velocity.y <= 0)
-            coyoteJumpLeavingTime = Time.time;  
+        if (rb.velocity.y <= 0)
+            coyoteJumpLeavingTime = Time.time;
     }
 
 
 
     private void AttemptBufferJump()
     {
-        if(isAirborne)
+        if (isAirborne)
             bufferJumpAttempTime = Time.time;
     }
-    
+
     private void BufferJump()
     {
-        if(Time.time < bufferJumpAttempTime + bufferJumpTreshold)
+        if (Time.time < bufferJumpAttempTime + bufferJumpTreshold)
         {
             Jump();
-            bufferJumpAttempTime = Time.time -1f;
+            bufferJumpAttempTime = Time.time - 1f;
         }
     }
     #endregion
-   
-    
+
+
     public void Knockback()
     {
         if (isKnocked)
@@ -139,12 +147,12 @@ public class Player : MonoBehaviour
         anim.SetTrigger("knockback");
         rb.velocity = new Vector2(knockbackForce.x * -facingDir, knockbackForce.y);
     }
-   
+
     private IEnumerator KnockbackRoutine()
     {
         isKnocked = true;
         yield return new WaitForSeconds(knockbackDuration);
-        isKnocked = false;  
+        isKnocked = false;
     }
 
     private void HandleInputs()
@@ -166,7 +174,7 @@ public class Player : MonoBehaviour
         {
             Jump();
         }
-        else if(isWallDetected)
+        else if (isWallDetected)
         {
             WallJump();
         }
@@ -181,15 +189,15 @@ public class Player : MonoBehaviour
     private void Jump() => rb.velocity = new Vector2(rb.velocity.x, jumpForce);
     private void DoubleJump()
     {
-     StopCoroutine(WallJumpRoutine());
-     isWallJumping = false;
-     rb.velocity = new Vector2(rb.velocity.x, doubleJumpForce);
+        StopCoroutine(WallJumpRoutine());
+        isWallJumping = false;
+        rb.velocity = new Vector2(rb.velocity.x, doubleJumpForce);
 
     }
 
     private void UpdateDoubleJump()
     {
-        if(isWallDetected && !canDoubleJump)
+        if (isWallDetected && !canDoubleJump)
         {
             canDoubleJump = true;
         }
@@ -210,8 +218,8 @@ public class Player : MonoBehaviour
     }
     private void WallJump()
     {
-       
-        rb.velocity = new Vector2(wallJumpForce.x * - facingDir, wallJumpForce.y);
+
+        rb.velocity = new Vector2(wallJumpForce.x * -facingDir, wallJumpForce.y);
         Flip();
         canDoubleJump = true;
         StopCoroutine(WallJumpRoutine());
@@ -244,11 +252,11 @@ public class Player : MonoBehaviour
 
     private void HandleMovement()
     {
-        if(isWallJumping)
+        if (isWallJumping)
             return;
         if (isWallDetected)
             return;
-        
+
 
         rb.velocity = new Vector2(xInput * moveSpeed, rb.velocity.y);
     }
@@ -266,8 +274,8 @@ public class Player : MonoBehaviour
 
         Gizmos.DrawLine(transform.position, new Vector2(transform.position.x, transform.position.y - groundCheckDistance));
         Gizmos.DrawLine(transform.position, new Vector2(transform.position.x + (wallCheckDistance * facingDir), transform.position.y));
-        Gizmos.DrawLine(new Vector2(transform.position.x, transform.position.y + .45f), new Vector2(transform.position.x + (wallCheckDistance * facingDir),transform.position.y + .45f));
-        Gizmos.DrawLine(new Vector2(transform.position.x, transform.position.y - .45f), new Vector2(transform.position.x + (wallCheckDistance * facingDir),transform.position.y - .45f));
-        
+        Gizmos.DrawLine(new Vector2(transform.position.x, transform.position.y + .45f), new Vector2(transform.position.x + (wallCheckDistance * facingDir), transform.position.y + .45f));
+        Gizmos.DrawLine(new Vector2(transform.position.x, transform.position.y - .45f), new Vector2(transform.position.x + (wallCheckDistance * facingDir), transform.position.y - .45f));
+
     }
 }
