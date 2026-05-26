@@ -7,11 +7,13 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
 
     [Header("Player")]
+    public Player player;
     [SerializeField] private GameObject playerPrefab;
     [SerializeField] private Transform respawnPoint;
     [SerializeField] private float respawnDuration;
-    
-    public Player player;
+
+    [Header("Checkpoints")]
+    public bool canReactivateCheckpoints;
 
     [Header("Fruits")]
     public int fruitsCollected;
@@ -25,6 +27,7 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
     }
 
+    public void UpdateSpawnPoint(Transform newCheckpoint) => respawnPoint = newCheckpoint;
     public void RespawnPlayer() => StartCoroutine(RespawnRoutine());
 
     private IEnumerator RespawnRoutine()
