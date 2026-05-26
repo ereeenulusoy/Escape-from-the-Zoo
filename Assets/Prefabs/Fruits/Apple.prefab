@@ -81,6 +81,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35982757d23784429a47d82271dc3b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fruitType: 0
+  pickupVfx: {fileID: 3245520447932740810, guid: cfd02b0dcab000245aa5699732aeb691, type: 3}
 --- !u!1 &8929818286033187707
 GameObject:
   m_ObjectHideFlags: 0

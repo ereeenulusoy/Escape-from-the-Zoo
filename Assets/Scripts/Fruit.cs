@@ -1,16 +1,6 @@
 using UnityEngine;
 
-public enum FruitType
-{
-    Apple,
-    Banana,
-    Cherry,
-    Kiwi,
-    Melon,
-    Orange,
-    Pineapple,
-    Strawberry
-}
+public enum FruitType {Apple,Banana,Cherry,Kiwi,Melon,Orange,Pineapple,Strawberry}
 
 public class Fruit : MonoBehaviour
 {
@@ -18,6 +8,8 @@ public class Fruit : MonoBehaviour
     private Animator anim;
 
     public FruitType fruitType;
+    [SerializeField] private GameObject pickupVfx;
+
 
     private void Awake()
     {
@@ -36,7 +28,11 @@ public class Fruit : MonoBehaviour
         if (player != null)
         {
             gameManager.AddFruit();
-            Destroy(gameObject, .2f);
+            Destroy(gameObject);
+
+            GameObject pickupFx = Instantiate(pickupVfx , transform.position, Quaternion.identity);
+            //Instantiate ettiðimiz fx'i tanýmlamamýz onu destroy edebilmemize olanak tanýr.
+
         }
     }
 
