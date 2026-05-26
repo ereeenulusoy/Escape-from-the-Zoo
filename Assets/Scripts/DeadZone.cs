@@ -12,6 +12,7 @@ public class DeadZone : MonoBehaviour
         {
             player.Die();
 
+            GameManager.instance.RespawnPlayer();
         }
     }
 }

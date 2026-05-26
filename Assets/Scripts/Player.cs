@@ -6,11 +6,18 @@ public class Player : MonoBehaviour
 
     private Rigidbody2D rb;
     private Animator anim;
+    private CapsuleCollider2D cd;
 
     private float xInput;
     private float yInput;
 
-    [SerializeField] private float moveSpeed = 5f;
+    [Header("Movement")]
+    [SerializeField] private float moveSpeed;
+    [SerializeField] private float jumpForce;
+    [SerializeField] private float doubleJumpForce;
+    private bool canDoubleJump;
+    private float defaultGravityScale;
+    private bool canBeControlled = false;
 
     [Header("Detections")]
     [SerializeField] private LayerMask groundLayer;
@@ -20,10 +27,6 @@ public class Player : MonoBehaviour
     private bool isGrounded;
     private bool isAirborne;
 
-    [Header("Jump")]
-    [SerializeField] private float jumpForce;
-    [SerializeField] private float doubleJumpForce;
-    private bool canDoubleJump;
 
     [Header("Flip Function")]
     private bool facingRight = true;
@@ -52,12 +55,20 @@ public class Player : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponentInChildren<Animator>();
+        cd = GetComponent<CapsuleCollider2D>();
+    }
+    private void Start()
+    {
+        defaultGravityScale = rb.gravityScale;
+        RespawnFinished(false);
     }
     private void Update()
     {
 
         UpdateAirborneStatus();
 
+        if (!canBeControlled)
+            return;
         if (isKnocked)
             return;
         HandleInputs();
@@ -68,6 +79,22 @@ public class Player : MonoBehaviour
         HandleAnimations();
     }
     
+    public void RespawnFinished(bool finished)
+    {
+        
+     if(finished)
+        {
+            canBeControlled = true;
+            rb.gravityScale = defaultGravityScale;
+            cd.enabled = true;
+        }
+     else
+        {
+            canBeControlled = false;
+            rb.gravityScale = 0f;
+            cd.enabled = false;
+        }
+    }
     public void Die()
     {
 
