@@ -16,8 +16,9 @@ public class GameManager : MonoBehaviour
     public bool canReactivateCheckpoints;
 
     [Header("Fruits")]
+    public bool fruitsAreRandom;
     public int fruitsCollected;
-    public bool setRandomFruit;
+    public int totalFruits;
 
     private void Awake()
     {
@@ -25,6 +26,16 @@ public class GameManager : MonoBehaviour
             instance = this;
         else
             Destroy(gameObject);
+    }
+
+    private void Start()
+    {
+        ClaimTotalFruitCount();
+    }
+    private void ClaimTotalFruitCount()
+    {
+        Fruit[] fruits = FindObjectsByType<Fruit>(FindObjectsSortMode.None);
+        totalFruits = fruits.Length;
     }
 
     public void UpdateSpawnPoint(Transform newCheckpoint) => respawnPoint = newCheckpoint;
@@ -42,6 +53,7 @@ public class GameManager : MonoBehaviour
                                                    //player = Instantiate(playerPrefab, respawnPoint.position, Quaternion.identity).GetComponent<Player>();
     }
     public void AddFruit() => fruitsCollected++;
-    public bool SetRandomFruit() => setRandomFruit;
+    public bool SetRandomFruit() => fruitsAreRandom;
+
 
 }
