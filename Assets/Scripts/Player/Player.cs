@@ -165,13 +165,18 @@ public class Player : MonoBehaviour
     #endregion
 
 
-    public void Knockback()
+    public void Knockback(float damagePositionX)
     {
         if (isKnocked)
             return;
-        anim.SetTrigger("knockback");
+        float damageDir = 1;
+
+        if (damagePositionX < transform.position.x)
+            damageDir = -1;
+
+            anim.SetTrigger("knockback");
         StartCoroutine(KnockbackRoutine());
-        rb.velocity = new Vector2(knockbackForce.x * -facingDir, knockbackForce.y);
+        rb.velocity = new Vector2(knockbackForce.x * -damageDir, knockbackForce.y);
     }
 
     private IEnumerator KnockbackRoutine()
