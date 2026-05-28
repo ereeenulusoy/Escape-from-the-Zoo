@@ -238,8 +238,8 @@ MonoBehaviour:
   wallCheckDistance: 0.7
   wallJumpForce: {x: 6, y: 15}
   wallJumpDuration: 0.6
-  knockbackDuration: 0.5
+  knockbackDuration: 0.57
   knockbackForce: {x: 6, y: 8}
-  bufferJumpTreshold: 0.3
-  coyoteJumpTreshold: 0.3
+  bufferJumpTreshold: 0.2
+  coyoteJumpTreshold: 0.25
   deathVfx: {fileID: 887144387858716643, guid: 4ccaaa4e55c697c4d85823d15c8446ca, type: 3}
