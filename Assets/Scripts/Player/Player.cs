@@ -41,6 +41,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float knockbackDuration;
     [SerializeField] private Vector2 knockbackForce;
     private bool isKnocked;
+   
 
     [Header("Buffer & Coyote Jump")]
     [SerializeField] private float bufferJumpTreshold;
@@ -50,6 +51,8 @@ public class Player : MonoBehaviour
 
     [Header("VFX")]
     [SerializeField] private GameObject deathVfx;
+
+    private Coroutine pushCoroutineMarker;
 
     private void Awake()
     {
@@ -68,7 +71,12 @@ public class Player : MonoBehaviour
         UpdateAirborneStatus();
 
         if (!canBeControlled)
+        {
+            HandleDetections();
+            HandleAnimations();
             return;
+        }
+
         if (isKnocked)
             return;
         HandleInputs();
@@ -102,6 +110,26 @@ public class Player : MonoBehaviour
         
      Destroy(gameObject);
 
+    }
+
+    public void Push(Vector2 direction, float duration = 0)
+    {
+        if (pushCoroutineMarker != null)
+            StopCoroutine(pushCoroutineMarker);
+
+        pushCoroutineMarker = StartCoroutine(PushCoroutine(direction, duration));
+    }
+
+    private IEnumerator PushCoroutine(Vector2 direction, float duration)
+    {
+        canBeControlled = false;
+
+        rb.velocity = Vector2.zero;
+        rb.AddForce(direction, ForceMode2D.Impulse);//Impulse modu Kaygan fizik hissi verir
+
+        yield return new WaitForSeconds(duration);
+
+        canBeControlled = true;
     }
     private void UpdateAirborneStatus()
     {
