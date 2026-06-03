@@ -18845,8 +18845,12 @@ PrefabInstance:
       value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 7915709128094024153, guid: 9857ef1b07800e348844e337230b0c51, type: 3}
+      propertyPath: duration
+      value: 0.45
+      objectReference: {fileID: 0}
+    - target: {fileID: 7915709128094024153, guid: 9857ef1b07800e348844e337230b0c51, type: 3}
       propertyPath: pushPower
-      value: 15
+      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
