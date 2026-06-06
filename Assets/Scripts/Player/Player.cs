@@ -1,4 +1,5 @@
 using System.Collections;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -17,7 +18,9 @@ public class Player : MonoBehaviour
     [SerializeField] private float doubleJumpForce;
     private bool canDoubleJump;
     private float defaultGravityScale;
+
     private bool canBeControlled = false;
+    private Coroutine pushCoroutineMarker;
 
     [Header("Detections")]
     [SerializeField] private LayerMask groundLayer;
@@ -68,7 +71,11 @@ public class Player : MonoBehaviour
         UpdateAirborneStatus();
 
         if (!canBeControlled)
+        {
+            HandleDetections();
+            HandleAnimations();
             return;
+        }
         if (isKnocked)
             return;
         HandleInputs();
@@ -165,21 +172,47 @@ public class Player : MonoBehaviour
     #endregion
 
 
-    public void Knockback()
+    public void Push(Vector2 direction, float duration)
+    {
+        if(pushCoroutineMarker != null)
+        StopCoroutine(pushCoroutineMarker);
+
+        //Coroutine'i baþlatýr ve marker içine kaydeder.
+        pushCoroutineMarker = StartCoroutine(PushCoroutine(direction,duration));
+
+    }
+
+    private IEnumerator PushCoroutine(Vector2 direction, float duration)
+    {
+        canBeControlled = false;
+        rb.velocity = Vector2.zero;
+        rb.AddForce(direction, ForceMode2D.Impulse);
+        yield return new WaitForSeconds(duration);
+        canBeControlled = true;
+        pushCoroutineMarker = null;
+    }
+    public void Knockback(float damageXPosition)
     {
         if (isKnocked)
             return;
+        int knockDirection = 1;
+
+        if (transform.position.x <= damageXPosition)
+            knockDirection = -1;
 
         StartCoroutine(KnockbackRoutine());
         anim.SetTrigger("knockback");
-        rb.velocity = new Vector2(knockbackForce.x * -facingDir, knockbackForce.y);
+        rb.velocity = new Vector2(knockbackForce.x * knockDirection, knockbackForce.y);
     }
 
     private IEnumerator KnockbackRoutine()
     {
         isKnocked = true;
+        anim.SetBool("isKnocked", true);
         yield return new WaitForSeconds(knockbackDuration);
         isKnocked = false;
+        anim.SetBool("isKnocked", false);
+
     }
 
     private void HandleInputs()
