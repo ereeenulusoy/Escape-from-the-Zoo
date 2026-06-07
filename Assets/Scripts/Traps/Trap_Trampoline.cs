@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class Trap_Trampoline : MonoBehaviour
 {
+    //protected inherit olan scriptlerin de eriþip deðiþtirebilmesini saðlar.
     private Animator anim;
     [SerializeField] private float pushPower;
     [SerializeField] private float duration = .5f;

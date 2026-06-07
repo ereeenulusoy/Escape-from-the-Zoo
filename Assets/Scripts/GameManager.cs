@@ -20,6 +20,9 @@ public class GameManager : MonoBehaviour
     public int fruitsCollected;
     public int totalFruits;
 
+    [Header("Traps")]
+    public GameObject arrowPrefab;
+
     private void Awake()
     {
         if (instance == null)
@@ -51,6 +54,17 @@ public class GameManager : MonoBehaviour
                                                    //Cevap Insantiate'de saklý. Instantiate edilen her þey **"GameObject"** türündedir. 
                                                    //Tek katmanlý bir biçimde newPlayer'e gerek kalmadan doldurabiliriz ancak okunabilirlik için 2 adýmda hallediyoruz.
                                                    //player = Instantiate(playerPrefab, respawnPoint.position, Quaternion.identity).GetComponent<Player>();
+    }
+
+    public void RecreateObject(GameObject prefab, Transform spawn, float delay = 0)
+    {
+        StartCoroutine(RereateObjectRoutine(prefab,spawn,delay));
+    }
+    private IEnumerator RereateObjectRoutine(GameObject prefab, Transform spawn, float delay)
+    {
+        Vector3 spawnPosition = spawn.position;
+        yield return new WaitForSeconds(delay);
+        GameObject newObject = Instantiate(prefab,spawnPosition, Quaternion.identity);
     }
     public void AddFruit() => fruitsCollected++;
     public bool SetRandomFruit() => fruitsAreRandom;
