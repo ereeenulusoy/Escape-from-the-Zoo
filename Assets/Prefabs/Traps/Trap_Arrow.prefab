@@ -138,7 +138,7 @@ MonoBehaviour:
   duration: 0.5
   rotationSpeed: 120
   recreateDelay: 1
-  rotatingRight: 0
+  rotatingRight: 1
   scaleUpSpeed: 10
   targetScale: {x: 1.5, y: 1.5, z: 1.5}
 --- !u!95 &5135697314403794990
