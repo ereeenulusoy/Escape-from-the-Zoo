@@ -22,11 +22,16 @@ public class Trap_Arrow : Trap_Trampoline
 
     private void Update() //Trampoline'deki Update'den baðýmsýz.
     {
+        HandleRecreateScaleUp();
+        HandleRotation();
+    }
+
+    private void HandleRecreateScaleUp()
+    {
         if (transform.localScale.x < targetScale.x)
         {
             transform.localScale = Vector3.Lerp(transform.localScale, targetScale, scaleUpSpeed * Time.deltaTime);
         }
-        HandleRotation();
     }
 
     private void HandleRotation()

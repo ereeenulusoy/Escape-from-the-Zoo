@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Traps")]
     public GameObject arrowPrefab;
+    public GameObject fallingPlatformPrefab;
 
     private void Awake()
     {
