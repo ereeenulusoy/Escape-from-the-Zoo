@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -20,6 +19,8 @@ public class GameManager : MonoBehaviour
     public int fruitsCollected;
     public int totalFruits;
 
+    [Header("Traps")]
+    public GameObject arrowPrefab;
     private void Awake()
     {
         if (instance == null)
@@ -54,6 +55,20 @@ public class GameManager : MonoBehaviour
     }
     public void AddFruit() => fruitsCollected++;
     public bool SetRandomFruit() => fruitsAreRandom;
+
+    public void RecreateGameObject(GameObject prefab, Transform spawnPosition, float cooldown = 0)
+    {
+        StartCoroutine(RecreateCoroutine(prefab, spawnPosition, cooldown));
+    }
+
+    private IEnumerator RecreateCoroutine(GameObject prefab, Transform spawnPosition, float cooldown)
+    {
+        Vector3 recreatePosition = spawnPosition.position;
+
+        yield return new WaitForSeconds(cooldown);
+
+        GameObject newObject = Instantiate(prefab, recreatePosition, Quaternion.identity);
+    }
 
 
 }
