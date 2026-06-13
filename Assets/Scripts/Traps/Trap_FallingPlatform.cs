@@ -32,6 +32,7 @@ public class Trap_FallingPlatform : MonoBehaviour
     [Header("Recreate")]
     [SerializeField] private float cooldown = .5f;
     [SerializeField] private float growthScale = 10;
+    [SerializeField] private Vector3 targetScale;
     [SerializeField] private Transform startTransform;
 
     private void Awake()
@@ -44,7 +45,7 @@ public class Trap_FallingPlatform : MonoBehaviour
     private IEnumerator Start()
     {
         startTransform = transform;
-        transform.localScale = new Vector3(.3f, .3f, .3f);
+        transform.localScale = new Vector3(.25f, .25f, .25f);
         SetupWayPoints();
         float randomDelay = Random.Range(0, .6f);
         yield return new WaitForSeconds(randomDelay);
@@ -52,10 +53,15 @@ public class Trap_FallingPlatform : MonoBehaviour
     }
     private void Update()
     {
-        if (transform.localScale.x < startTransform.localScale.x)
-            transform.localScale = Vector3.Lerp(transform.localScale, startTransform.localScale, growthScale * Time.deltaTime);
+        HandleRecreateGrowth();
         HandleMovement();
         HandleImpact();
+    }
+
+    private void HandleRecreateGrowth()
+    {
+        if (transform.localScale.x < targetScale.x)
+            transform.localScale = Vector3.Lerp(transform.localScale, targetScale, growthScale * Time.deltaTime);
     }
 
     private void HandleImpact()
@@ -133,6 +139,6 @@ public class Trap_FallingPlatform : MonoBehaviour
     {
         GameObject platformPrefab = GameManager.instance.platformPrefab;
         GameManager.instance.RecreateGameObject(platformPrefab, transform, cooldown);
-        Destroy(gameObject,5f);
+        Destroy(gameObject,cooldown);
     }
 }

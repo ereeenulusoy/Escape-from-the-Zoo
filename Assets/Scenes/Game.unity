@@ -18954,10 +18954,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Trap_FallingPlatform
       objectReference: {fileID: 0}
-    - target: {fileID: 6099679922561615088, guid: e64370ee329f4744a85227788452434b, type: 3}
-      propertyPath: cooldown
-      value: 4
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
