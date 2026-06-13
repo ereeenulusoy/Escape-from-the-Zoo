@@ -11,7 +11,7 @@ public class Trap_Arrow : Trap_Trampoline
     [Header("Recreate")]
     [SerializeField] private float cooldown = .5f;
     [SerializeField] private float growthScale = 10;
-    [SerializeField] private Vector3 normalScale;
+    private Vector3 normalScale;
 
 
     private void Start()

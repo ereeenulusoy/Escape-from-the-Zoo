@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Traps")]
     public GameObject arrowPrefab;
+    public GameObject platformPrefab;
     private void Awake()
     {
         if (instance == null)
