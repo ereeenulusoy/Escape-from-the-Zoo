@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -53,9 +54,28 @@ public class Trap_Saw : MonoBehaviour
     }
     private void AssignWayPointPositions()
     {
-        wayPointPosition = new Vector3[wayPoint.Length]; // Inspector yerine Startta oluþturma sebebimiz scaleable olmasý için.
-                                                         // ileride 5 6 noktayý gezdirebiliriz ve tek tek uðraþmadan kendisi hallolur.
+        // Child objelerde Trap_SawWaypoint olanlarý toplayan bir list. getcomponent"S" olma sebebi list / array olmasý.
+        List<Trap_SawWaypoint> wayPointList = new List<Trap_SawWaypoint>(GetComponentsInChildren<Trap_SawWaypoint>());
 
+        if (wayPointList.Count != wayPoint.Length)
+        {
+            wayPoint = new Transform[wayPointList.Count];
+
+            for (int i = 0; i < wayPointList.Count; i++)
+            {
+                wayPoint[i] = wayPointList[i].transform;
+            }
+        }
+
+
+        wayPointPosition = new Vector3[wayPoint.Length]; // LÝST EKLENMEDEN ÖNCEKÝ NOTLAR...
+                                                         // Inspector yerine Startta oluþturma sebebimiz scaleable olmasý için.
+                                                         // ileride 5 6 noktayý gezdirebiliriz ve tek tek uðraþmadan kendisi hallolur.
+                                                         // LÝST EKLENDÝKTEN SONRAKÝ NOTLAR...
+                                                         // Burada yarý otomatik hallediyoruz. Yani Transformlarý hala ekleme derdimiz var.
+                                                         // Unutsak dahi eklemesi için hepsine Trap_SawWaypoint scripti atayýp
+                                                         // List ile GetComponentInChildren<Trap_SawWaypoint> bulup
+                                                         // tamamen otomatik ekleme sistemi geliþtiriyoruz.
         for (int i = 0; i < wayPoint.Length; i++)
         {
             wayPointPosition[i] = wayPoint[i].position;
