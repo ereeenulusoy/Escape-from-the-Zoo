@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -59,13 +58,13 @@ public class GameManager : MonoBehaviour
 
     public void RecreateObject(GameObject prefab, Vector3 spawn, float delay = 0)
     {
-        StartCoroutine(RereateObjectRoutine(prefab,spawn,delay));
+        StartCoroutine(RereateObjectRoutine(prefab, spawn, delay));
     }
     private IEnumerator RereateObjectRoutine(GameObject prefab, Vector3 spawn, float delay)
     {
         Vector3 spawnPosition = spawn;
         yield return new WaitForSeconds(delay);
-        GameObject newObject = Instantiate(prefab,spawnPosition, Quaternion.identity);
+        GameObject newObject = Instantiate(prefab, spawnPosition, Quaternion.identity);
     }
     public void AddFruit() => fruitsCollected++;
     public bool SetRandomFruit() => fruitsAreRandom;

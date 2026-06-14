@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Trap_Arrow : Trap_Trampoline
@@ -17,6 +15,7 @@ public class Trap_Arrow : Trap_Trampoline
     private void Start()
     {
         transform.localScale = new Vector3(.3f, .3f, .3f);
+
     }
 
 
