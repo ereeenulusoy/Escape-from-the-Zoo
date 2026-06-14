@@ -57,13 +57,13 @@ public class GameManager : MonoBehaviour
                                                    //player = Instantiate(playerPrefab, respawnPoint.position, Quaternion.identity).GetComponent<Player>();
     }
 
-    public void RecreateObject(GameObject prefab, Transform spawn, float delay = 0)
+    public void RecreateObject(GameObject prefab, Vector3 spawn, float delay = 0)
     {
         StartCoroutine(RereateObjectRoutine(prefab,spawn,delay));
     }
-    private IEnumerator RereateObjectRoutine(GameObject prefab, Transform spawn, float delay)
+    private IEnumerator RereateObjectRoutine(GameObject prefab, Vector3 spawn, float delay)
     {
-        Vector3 spawnPosition = spawn.position;
+        Vector3 spawnPosition = spawn;
         yield return new WaitForSeconds(delay);
         GameObject newObject = Instantiate(prefab,spawnPosition, Quaternion.identity);
     }

@@ -23,10 +23,10 @@ public class Trap_FallingPlatform : MonoBehaviour
     private bool impacted;
 
     [Header("Recreate Details")]
-    [SerializeField] private bool canBeRecreated;
-    [SerializeField] private Transform startPosition;
+    [SerializeField] private bool canBeRecreated; //respawn açýk mý kapalý mý ?
     [SerializeField] private float recreateDelay = 2.5f;
     [SerializeField] private float scaleUpSpeed = 10;
+    [SerializeField] private Vector3 startPosition;
     [SerializeField] private Vector3 targetScale;
 
 
@@ -40,7 +40,7 @@ public class Trap_FallingPlatform : MonoBehaviour
     {
         AssignWayPointPositions();
 
-        startPosition = transform;
+        startPosition = transform.position;
 
         transform.localScale = new Vector3(.25f, .25f, .25f);
 
@@ -118,7 +118,7 @@ public class Trap_FallingPlatform : MonoBehaviour
 
             RecreatePlatform();
 
-            Destroy(gameObject, 2f);
+           
         }
     }
     private void RecreatePlatform()
@@ -127,6 +127,7 @@ public class Trap_FallingPlatform : MonoBehaviour
             return;
         GameObject platformPrefab = GameManager.instance.fallingPlatformPrefab;
         GameManager.instance.RecreateObject(platformPrefab, startPosition, recreateDelay);
+        Destroy(gameObject, recreateDelay);
     }
 
     private void SwitchOffPlatform()
